@@ -4,6 +4,13 @@
 
 # originally inspired by https://github.com/leeliu/dbench
 
+## checking if fio is installed 
+if ! command -v fio &> /dev/null 
+then 
+	echo "fio could not be found, please install fio."
+	exit
+fi
+
 # specify a space seperated set of files to use as tests. tests are run in paralled across all files
 if [ -z "${FIO_files}" ] 
 then FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
