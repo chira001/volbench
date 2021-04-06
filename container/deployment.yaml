@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: benchmark
+  name: benchmark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: benchmark
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: benchmark
+    spec:
+      containers:
+      - image: volbench
+        name: volbench
+        resources: {}
+        imagePullPolicy: Never
+        env:
+        - name: FIO_files
+          value: "/tmp/volbenchtest1 /tmp/volbenchtest2"
+        - name: FIO_size
+          value: "1MB"
+        - name: FIO_ramptime
+          value: "1"
+        - name: FIO_runtime
+          value: "5"
+        - name: FIO_rwmixread
+          value: "75"
+        - name: FIO_fdatasync
+          value: "0"
+status: {}
