@@ -3,7 +3,7 @@
 # originally inspired by https://github.com/leeliu/dbench
 
 # specify a space seperated set of files to use as tests. tests are run in paralled across all files
-FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
+#FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
 # note: the test files are not deleted at the end, to make it easy to run multiple tests
 #       please remember to delete the test files
 # # specify the size of the test files
@@ -13,9 +13,9 @@ FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
 # specify a runtime for each test - should be 30s minimum, but 120 is preferred
 #FIO_runtime=120
 # # specify the percentage of read requests in mixed tests
-FIO_rwmixread=75
+#FIO_rwmixread=75
 # specify how many write i/os before an fdatasync - 0 disables
-FIO_fdatasync=0
+#FIO_fdatasync=0
 
 # specify default number of jobs per file - default to 1 (don't change this)
 FIO_numjobs=1

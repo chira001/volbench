@@ -7,7 +7,9 @@ services:
                 volumes: 
                         - /tmp:/tmp
                 environment:
+                        - FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
                         - FIO_size=1MB
                         - FIO_ramptime=1
                         - FIO_runtime=5
- 
+                        - FIO_rwmixread=75
+                        - FIO_fdatasync=0  
