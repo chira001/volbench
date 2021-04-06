@@ -64,7 +64,7 @@ do
 			echo "  -f       how many write I/Os before a fdatasync happnes"
 			echo "               e.g. & default; 0 (disable)"
 			echo 
-			echo "Example: \"$0 -d \"/mnt/data/file1 /mnt/data/file2\" -s 1
+			echo "Example: $0 -d \"/mnt/data/file1 /mnt/data/file2\" -s 100MB -r 5 -t 5 -w 50 -f 50"
 			echo "PR and Comments: <https://github.com/chira001/volbench> "
 			exit ;;
 	esac 
