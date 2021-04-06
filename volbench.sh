@@ -1,54 +1,98 @@
 #!/usr/bin/env bash
-
 # published at https://github.com/chira001/volbench - PR and comments welcome
-
 # originally inspired by https://github.com/leeliu/dbench
 
 ## checking if fio is installed 
 if ! command -v fio &> /dev/null 
 then 
 	echo "fio could not be found, please install fio."
+	command fio
 	exit
 fi
 
 # specify a space seperated set of files to use as tests. tests are run in paralled across all files
-if [ -z "${FIO_files}" ] 
-then FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
-fi
-
+FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
 # note: the test files are not deleted at the end, to make it easy to run multiple tests
 #       please remember to delete the test files
-
-# specify the size of the test files
-if [ -z "${FIO_size}" ] 
-then FIO_size=100MB
-fi
-
+# # specify the size of the test files
+FIO_size=10MB
 # specify a ramp time before recording values - this should be around 10 seconds
-if [ -z "${FIO_ramptime}" ]
-then FIO_ramptime=1s
-fi
-
+FIO_ramptime=10
 # specify a runtime for each test - should be 30s minimum, but 120 is preferred
-if [ -z "${FIO_runtime}" ] 
-then FIO_runtime=2s
-fi
-
-# specify the percentage of read requests in mixed tests
-if [ -z "${FIO_rwmixread}" ]
-then FIO_rwmixread=75
-fi
-
+FIO_runtime=120
+# # specify the percentage of read requests in mixed tests
+FIO_rwmixread=75
 # specify how many write i/os before an fdatasync - 0 disables
-if [ -z "${FIO_datasync}" ]
-then FIO_fdatasync=0
-fi
-
+FIO_fdatasync=0
 
 # specify default number of jobs per file - default to 1 (don't change this)
 FIO_numjobs=1
 #specify default offset_increment - default to 0 (don't change this)
 FIO_offset_increment=0
+
+while getopts d:s:r:t:w:f:hq option
+do 
+	case "${option}" in 
+		d) FIO_files=${OPTARG};;
+		s) FIO_size=${OPTARG};;
+		r) FIO_ramptime=${OPTARG};;
+		t) FIO_runtime=${OPTARG};;
+		w) FIO_rwmixread=${OPTARG};;
+		f) FIO_fdatasync=${OPTARG};;
+		q) 
+			FIO_size=10MB
+			FIO_ramptime=1
+			FIO_runtime=2;;
+		h) 
+			echo "Usage: $0 [OPTION]..."
+			echo "Standardized benchmarking for volumes."
+			echo 
+			echo "  -h       show the usage"
+			echo "  -q       run $0 with reduce ramp and run time to do a real dry-run"
+			echo 
+			echo "Mandatory arguments for short options."
+			echo "  -d       space separated set of files to use as tests in parallel."
+			echo "               e.g. & default; $FIO_files "
+			echo "  -s       size of the test files with a measurement unit"
+			echo "               e.g. & default; 10MB"
+			echo "  -r       ramp time in seconds before recording values"
+			echo "               e.g. & default; 10"
+			echo "  -t       run time in for each test"
+			echo "               e.g. & default; 120"
+			echo "  -w       workload ratio of read requests in percentage"
+			echo "               e.g. & default; 75"
+			echo "  -f       how many write I/Os before a fdatasync happnes"
+			echo "               e.g. & default; 0 (disable)"
+			echo 
+			echo "Example: \"$0 -d \"/mnt/data/file1 /mnt/data/file2\" -s 1
+			echo "PR and Comments: <https://github.com/chira001/volbench> "
+			exit ;;
+	esac 
+done 
+
+if [[ $# -eq 0 ]]
+then 
+	echo "$0 will run with the following recommended parameters:"
+	echo "  FIO_files=$FIO_files"
+	echo "  FIO_size=$FIO_size"
+	echo "  FIO_ramptime=$FIO_ramptime"
+	echo "  FIO_runtime=$FIO_runtime"
+	echo "  FIO_rwmixread=$FIO_rwmixread"
+	echo "  FIO_fdatasync=$FIO_fdatasync"
+	echo "The total running time will be around 15 minutes."
+	echo
+	echo "For rapid dry-run, run \"$0 -q\" (total run time is around 30 seconds)."
+	echo "For details on the usage, run \"$0 -h\"."
+	echo 
+
+	# below read and case should be remove when containerized
+	read -p "Continue with the above values? " answer
+	case $answer in 
+		[yY] ) echo "Starting $0 with default parameters...";;
+		[nN] ) exit;;
+	esac 
+fi
+
 
 
 #define some colour escape codes
@@ -58,7 +102,7 @@ CYAN='\033[1;34m'
 NC='\033[0m'
 
 
-# global setttins for all fio jobs
+# global setttings for all fio jobs
 function fio-global {
 	echo "[global]
 bs=${FIO_blocksize}k
