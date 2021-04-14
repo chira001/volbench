@@ -3,19 +3,19 @@
 # originally inspired by https://github.com/leeliu/dbench
 
 # specify a space seperated set of files to use as tests. tests are run in paralled across all files
-FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
+#FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
 # note: the test files are not deleted at the end, to make it easy to run multiple tests
 #       please remember to delete the test files
 # # specify the size of the test files
-FIO_size=10MB
+#FIO_size=10MB
 # specify a ramp time before recording values - this should be around 10 seconds
-FIO_ramptime=10
+#FIO_ramptime=10
 # specify a runtime for each test - should be 30s minimum, but 120 is preferred
-FIO_runtime=10
+#FIO_runtime=10
 # # specify the percentage of read requests in mixed tests
-FIO_rwmixread=75
+#FIO_rwmixread=75
 # specify how many write i/os before an fdatasync - 0 disables
-FIO_fdatasync=0
+#FIO_fdatasync=0
 
 # specify default number of jobs per file - default to 1 (don't change this)
 FIO_numjobs=1
@@ -78,9 +78,9 @@ function fio-run {
 	sync
 	
 	#if we are root, then drop the kernel caches
-	if [ $UID -eq 0 ]
-		then echo 1 > /proc/sys/vm/drop_caches
-	fi
+	# if [ $UID -eq 0 ]
+	# 	then echo 1 > /proc/sys/vm/drop_caches
+	# fi
 
 	#combine the global params and the jobspec and run fio
 	( fio-global ; fio-job $FIO_files ) | fio --minimal -

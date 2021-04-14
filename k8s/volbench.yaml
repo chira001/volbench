@@ -30,6 +30,19 @@ spec:
       volumeMounts:
         - mountPath: /tmp
           name: tmp1
+      env:
+      - name: FIO_files
+        value: "/tmp/volbenchtest1 /tmp/volbenchtest2"
+      - name: FIO_size
+        value: "1MB"
+      - name: FIO_ramptime
+        value: "1"
+      - name: FIO_runtime
+        value: "5"
+      - name: FIO_rwmixread
+        value: "75"
+      - name: FIO_fdatasync
+        value: "0"
   volumes:
     - name: tmp1
       persistentVolumeClaim:
