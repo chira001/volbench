@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: volbench
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: volbenchtemp1
+  namespace: volbench
+spec:
+  storageClassName: "fast"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volbench-runner
+  namespace: volbench
+spec:
+  containers:
+    - name: alpine
+      image: alpine
+      command: ["/bin/sh"]
+      args: ["-c", 'apk update && apk add git fio bash --no-cache; git clone http://github.com/rovandep/volbench.git; /volbench/k8s/volbench.sh; sleep 36000']
+      volumeMounts:
+        - mountPath: /tmp
+          name: tmp1
+  volumes:
+    - name: tmp1
+      persistentVolumeClaim:
+        claimName: volbenchtemp1
