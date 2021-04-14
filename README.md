@@ -1,6 +1,6 @@
 # volbench
-Standardized benchmarking for volumes
+Standardized benchmarking for volumes using ```fio```
 
-Example run:
-
-![volbench sample run](https://github.com/chira001/volbench/blob/main/images/samplerun.png)
+There are two flavors:
+- cli; benchmarking disks on a linux (virtual) machine
+- k8s; benchmarking persistent volumes on kubernetes cluster

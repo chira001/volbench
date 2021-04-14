@@ -68,8 +68,24 @@ spec:
 ```
 
 Note: there are environment variables defined under ```env:``` within the YAML configuration file defining the ```fio``` benchmarking profile.
+The following extract from ```volbench.sh``` provides a details about each variables:
 
-Here is an overview of the ones shipped in the configuraiton file that allows a very fast run to check that all is working as expected.
+```bash
+# specify a space seperated set of files to use as tests. tests are run in paralled across all files
+FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
+# note: the test files are not deleted at the end, to make it easy to run multiple tests
+#       please remember to delete the test files
+# # specify the size of the test files
+FIO_size=10MB
+# specify a ramp time before recording values - this should be around 10 seconds
+FIO_ramptime=10
+# specify a runtime for each test - should be 30s minimum, but 120 is preferred
+FIO_runtime=10
+# # specify the percentage of read requests in mixed tests
+FIO_rwmixread=75
+# specify how many write i/os before an fdatasync - 0 disables
+FIO_fdatasync=0
+``` 
 
 
 ## how to use it
