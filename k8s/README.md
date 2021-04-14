@@ -1,14 +1,14 @@
-# volbench on k8s
+## volbench on k8s
 Standardized benchmarking for volumes hosted on kubernetes
 
-## how does it look like
+### how does it look like
 To guarantee the simplest usage possible, the k8s version is composed of two files:
 - ```volbench.sh``` which is the actual bash script calling ```fio``` with the relevant benchmarking profile
 - ```volbench.yaml``` which is a standard yaml configuration file 
 
 Note: ```volbench.sh``` has very few changes from the CLI version to run smoothly as a pod on k8s.
 
-## what does ```volbench.yaml``` do
+### what does ```volbench.yaml``` do
 When applying the file towards a k8s cluster, it will create: 
 - a namespace called ```volbench```
 - a persistent volume claim called ```volbenchtemp1``` linked to the created namespace
@@ -87,8 +87,7 @@ FIO_rwmixread=75
 FIO_fdatasync=0
 ``` 
 
-
-## how to use it
+### how to use it
 In a nutshell, from the above YAML output:
 - the ```storageClassName``` might need to be change to match the existing ```storageClassName``` on the targeted k8s.  
 - the ```env``` field might need to be change to match the desired ```fio``` benchmarking profile.
