@@ -3,7 +3,7 @@
 # originally inspired by https://github.com/leeliu/dbench
 
 # specify a space seperated set of files to use as tests. tests are run in paralled across all files
-#FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
+FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
 # note: the test files are not deleted at the end, to make it easy to run multiple tests
 #       please remember to delete the test files
 # # specify the size of the test files
