@@ -41,16 +41,16 @@ metadata:
   namespace: volbench
 spec:
   containers:
-    - name: alpine
-      image: alpine
+    - name: ubuntu
+      image: ubuntu:latest
       command: ["/bin/sh"]
-      args: ["-c", 'apk update && apk add git fio bash --no-cache; git clone --single-branch --branch containerized http://github.com/rovandep/volbench.git; /volbench/k8s/volbench.sh; sleep 36000']
+      args: ["-c", 'apt update; apt install -y fio git; git clone --single-branch --branch containerized http://github.com/rovandep/volbench.git; /volbench/k8s/volbench.sh; sleep 36000']
       volumeMounts:
-        - mountPath: /tmp
+        - mountPath: /mnt
           name: tmp1
       env:
       - name: FIO_files
-        value: "/tmp/volbenchtest1 /tmp/volbenchtest2"
+        value: "/mnt/volbenchtest1 /mnt/volbenchtest2"
       - name: FIO_size
         value: "1MB"
       - name: FIO_ramptime
@@ -72,7 +72,7 @@ The following extract from ```volbench.sh``` provides a details about each varia
 
 ```bash
 # specify a space seperated set of files to use as tests. tests are run in paralled across all files
-FIO_files="/tmp/volbenchtest1 /tmp/volbenchtest2"
+FIO_files="/mnt/volbenchtest1 /mnt/volbenchtest2"
 # note: the test files are not deleted at the end, to make it easy to run multiple tests
 #       please remember to delete the test files
 # # specify the size of the test files
