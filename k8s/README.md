@@ -79,5 +79,3 @@ In a nutshell, from the above YAML output:
 
 Then:
 [![asciicast](https://asciinema.org/a/407266.svg)](https://asciinema.org/a/407266)
-
-<script id="asciicast-407266" src="https://asciinema.org/a/407266.js" async></script>
