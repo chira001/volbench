@@ -45,10 +45,13 @@ then FIO_fdatasync=0
 fi
 
 
-# specify default number of jobs per file - default to 1 (don't change this)
-FIO_numjobs=1
-#specify default offset_increment - default to 0 (don't change this)
-FIO_offset_increment=0
+# specify default number of jobs per file
+# note: this is specified per test
+#FIO_numjobs=1
+
+#specify default offset_increment
+#node: this is specified per test
+#FIO_offset_increment=0
 
 
 #define some colour escape codes
@@ -115,6 +118,11 @@ function fio-run {
 	( fio-global ; fio-job $FIO_files ) | fio --minimal -
 }
 
+# print test title
+function test-title {
+	echo "$* (size=$FIO_size, increment=$FIO_offset_increment, blocksize=$FIO_blocksize, qd=$FIO_queuedepth, profile=$FIO_readwrite)"
+}
+
 
 #start the suite of tests
 echo
@@ -125,77 +133,79 @@ echo "FIO_files=$FIO_files"
 echo "FIO_size=$FIO_size  FIO_ramptime=$FIO_ramptime  FIO_runtime=$FIO_runtime"
 echo ; echo
 
-
-# test concurrent random read iops - e.g. db queries/message bus
-echo Testing read iops ...
-FIO_blocksize=4k FIO_queuedepth=16 FIO_readwrite=randread FIO_percentage_random=100
-FIO_output=$(fio-run)
-echo "$FIO_output" | fio-parse
-READ_IOPS=`echo "$FIO_output" | fio-getfield 1`
-
-# test concurrent randdom write iops - e.g. db commits
-echo Testing write iops ...
-FIO_blocksize=4k FIO_queuedepth=16 FIO_readwrite=randwrite FIO_percentage_random=100
-FIO_output=$(fio-run)
-echo "$FIO_output" | fio-parse
-WRITE_IOPS=`echo "$FIO_output" | fio-getfield 4`
-
-# test read throughput
-echo Testing read throughput ...
-FIO_blocksize=128k FIO_queuedepth=16 FIO_readwrite=randread FIO_percentage_random=100
-FIO_output=$(fio-run)
-echo "$FIO_output" | fio-parse
-READ_MB=`echo "$FIO_output" | fio-getfield 3`
-
-# test write throughput
-echo Testing write throughput ...
-FIO_blocksize=128k FIO_queuedepth=16 FIO_readwrite=randwrite FIO_percentage_random=100
-FIO_output=$(fio-run)
-echo "$FIO_output" | fio-parse
-WRITE_MB=`echo "$FIO_output" | fio-getfield 6`
-
-# test read latency, low concurrency
-echo Testing read latency ...
-FIO_blocksize=4k FIO_queuedepth=4 FIO_readwrite=randread FIO_percentage_random=100
-FIO_output=$(fio-run)
-echo "$FIO_output" | fio-parse
-READ_LAT=`echo "$FIO_output" | fio-getfield 2`
-
-# test write latency, low concurrency
-echo Testing write latency ...
-FIO_blocksize=4k FIO_queuedepth=4 FIO_readwrite=randwrite FIO_percentage_random=100
-FIO_output=$(fio-run)
-echo "$FIO_output" | fio-parse
-WRITE_LAT=`echo "$FIO_output" | fio-getfield 5`
-
-# test concurrent read and write iops
-echo Testing mixed iops ...
-FIO_blocksize=4k FIO_queuedepth=16 FIO_readwrite=randrw FIO_percentage_random=100
-FIO_output=$(fio-run)
-echo "$FIO_output" | fio-parse
-READ_MIXED=`echo "$FIO_output" | fio-getfield 1`
-WRITE_MIXED=`echo "$FIO_output" | fio-getfield 4`
-
-# update FIO_size and set increment to be able to split across 4 jobs
+# update FIO_size and set increment to be able to split across 4 jobs for sequential throughput test
+FIO_origsize=$FIO_size
 FIO_unit=`echo $FIO_size | sed 's/[0-9]//g'`
 FIO_sizenumber=`echo $FIO_size | sed 's/[a-z]//ig'`
 FIO_offset_increment=`expr $FIO_sizenumber / 4`$FIO_unit
-FIO_oldsize=$FIO_size
 FIO_size=$FIO_offset_increment
 
 # test read sequental throughput
-echo Testing read seqential ...
 FIO_blocksize=1M FIO_queuedepth=4 FIO_readwrite=read FIO_percentage_random=0 FIO_numjobs=4
+test-title Testing read seqential ...
 FIO_output=$(fio-run)
 echo "$FIO_output" | fio-parse
 READ_SEQ=`echo "$FIO_output" | fio-getfield 3`
 
 # test write sequention throughput
-echo Testing write seqential ...
 FIO_blocksize=1M FIO_queuedepth=4 FIO_readwrite=write FIO_percentage_random=0 FIO_numjobs=4
+test-title Testing write seqential ...
 FIO_output=$(fio-run)
 echo "$FIO_output" | fio-parse
 WRITE_SEQ=`echo "$FIO_output" | fio-getfield 6`
+
+#reset the FIO_size following the sequential throughput test
+FIO_size=$FIO_origsize
+
+# test read throughput
+FIO_blocksize=128k FIO_queuedepth=16 FIO_readwrite=randread FIO_percentage_random=100 FIO_numjobs=1 FIO_offset_increment=0
+test-title Testing read throughput ...
+FIO_output=$(fio-run)
+echo "$FIO_output" | fio-parse
+READ_MB=`echo "$FIO_output" | fio-getfield 3`
+
+# test write throughput
+FIO_blocksize=128k FIO_queuedepth=16 FIO_readwrite=randwrite FIO_percentage_random=100 FIO_numjobs=1 FIO_offset_increment=0
+test-title Testing write throughput ...
+FIO_output=$(fio-run)
+echo "$FIO_output" | fio-parse
+WRITE_MB=`echo "$FIO_output" | fio-getfield 6`
+
+# test concurrent random read iops - e.g. db queries/message bus
+FIO_blocksize=4k FIO_queuedepth=16 FIO_readwrite=randread FIO_percentage_random=100 FIO_numjobs=1 FIO_offset_increment=0
+test-title Testing read iops ...
+FIO_output=$(fio-run)
+echo "$FIO_output" | fio-parse
+READ_IOPS=`echo "$FIO_output" | fio-getfield 1`
+
+# test concurrent randdom write iops - e.g. db commits
+FIO_blocksize=4k FIO_queuedepth=16 FIO_readwrite=randwrite FIO_percentage_random=100 FIO_numjobs=1 FIO_offset_increment=0
+test-title Testing write iops ...
+FIO_output=$(fio-run)
+echo "$FIO_output" | fio-parse
+WRITE_IOPS=`echo "$FIO_output" | fio-getfield 4`
+
+# test read latency, low concurrency
+FIO_blocksize=4k FIO_queuedepth=4 FIO_readwrite=randread FIO_percentage_random=100 FIO_numjobs=1 FIO_offset_increment=0
+test-title Testing read latency ...
+FIO_output=$(fio-run)
+echo "$FIO_output" | fio-parse
+READ_LAT=`echo "$FIO_output" | fio-getfield 2`
+
+# test write latency, low concurrency
+FIO_blocksize=4k FIO_queuedepth=4 FIO_readwrite=randwrite FIO_percentage_random=100 FIO_numjobs=1 FIO_offset_increment=0
+test-title Testing write latency ...
+FIO_output=$(fio-run)
+echo "$FIO_output" | fio-parse
+WRITE_LAT=`echo "$FIO_output" | fio-getfield 5`
+
+# test concurrent read and write iops
+FIO_blocksize=4k FIO_queuedepth=16 FIO_readwrite=randrw FIO_percentage_random=100 FIO_numjobs=1 FIO_offset_increment=0
+test-title Testing mixed iops ...
+FIO_output=$(fio-run)
+echo "$FIO_output" | fio-parse
+READ_MIXED=`echo "$FIO_output" | fio-getfield 1`
+WRITE_MIXED=`echo "$FIO_output" | fio-getfield 4`
 
 
 #output final report
