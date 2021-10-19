@@ -11,7 +11,7 @@
 # specify a ramp time before recording values - this should be around 10 seconds
 #FIO_ramptime=10
 # specify a runtime for each test - should be 30s minimum, but 120 is preferred
-#FIO_runtime=120
+#FIO_runtime=10
 # # specify the percentage of read requests in mixed tests
 #FIO_rwmixread=75
 # specify how many write i/os before an fdatasync - 0 disables
@@ -78,9 +78,9 @@ function fio-run {
 	sync
 	
 	#if we are root, then drop the kernel caches
-	if [ $UID -eq 0 ]
-		then echo 1 > /proc/sys/vm/drop_caches
-	fi
+	# if [ $UID -eq 0 ]
+	# 	then echo 1 > /proc/sys/vm/drop_caches
+	# fi
 
 	#combine the global params and the jobspec and run fio
 	( fio-global ; fio-job $FIO_files ) | fio --minimal -
