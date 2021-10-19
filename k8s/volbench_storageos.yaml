@@ -34,11 +34,11 @@ spec:
       - name: FIO_files
         value: "/mnt/volbenchtest1 /mnt/volbenchtest2"
       - name: FIO_size
-        value: "1MB"
+        value: "10MB"
       - name: FIO_ramptime
-        value: "1"
+        value: "10"
       - name: FIO_runtime
-        value: "5"
+        value: "60"
       - name: FIO_rwmixread
         value: "75"
       - name: FIO_fdatasync
