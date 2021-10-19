@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: volbench-hp
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: volbench-pv-hp
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: volbench-pvc-claim
+  namespace: volbench-hp
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volbench-runner
+  namespace: volbench-hp
+spec:
+  containers:
+    - name: ubuntu
+      image: ubuntu:latest
+      command: ["/bin/sh"]
+      args: ["-c", 'apt update; apt install -y fio git; git clone --single-branch --branch containerized http://github.com/rovandep/volbench.git; /volbench/k8s/volbench.sh; sleep 36000']
+      volumeMounts:
+        - mountPath: /mnt
+          name: tmp1
+      env:
+      - name: FIO_files
+        value: "/mnt/volbenchtest1 /mnt/volbenchtest2"
+      - name: FIO_size
+        value: "1MB"
+      - name: FIO_ramptime
+        value: "1"
+      - name: FIO_runtime
+        value: "5"
+      - name: FIO_rwmixread
+        value: "75"
+      - name: FIO_fdatasync
+        value: "0"
+  volumes:
+    - name: tmp1
+      persistentVolumeClaim:
+        claimName: volbench-pvc-claim
