@@ -4,7 +4,8 @@ Standardized benchmarking for volumes hosted on kubernetes
 ### how does it look like
 To guarantee the simplest usage possible, the k8s version is composed of two files:
 - ```volbench.sh``` which is the actual bash script calling ```fio``` with the relevant benchmarking profile
-- ```volbench.yaml``` which is a standard yaml configuration file 
+- ```volbench_storageos.yaml``` which is a standard yaml configuration file using the StorageOS ```fast``` default StorageClass
+- ```volbench_hostpath.yaml```which is a standard yaml configuration file using the HostPath (local filesystem) as StorageClass
 
 Note: ```volbench.sh``` has very few changes from the CLI version to run smoothly as a pod on k8s.
 
